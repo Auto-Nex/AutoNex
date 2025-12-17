@@ -19,5 +19,5 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
-    console.log('Auto Nex loaded successfully.');
+    console.log('AutoNex loaded successfully.');
 });
