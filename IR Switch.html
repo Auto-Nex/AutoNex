@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Nex</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="email.css">
+    <link rel="icon"  href="img/logo.png">
+    <!-- <link rel="stylesheet" href="E:\A2Z-ROBO\A2Z-ROBO\css\style.css"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img class="image" src="img/logo.png" alt="Auto Nex Logo" > <!-- logo image -->
+            <h1><span class="highlight">Auto</span> Nex</h1>
+        </div>
+        <nav>
+            <a href="index.html">HOME</a>
+            <!-- <a href="#contact">Contact</a> -->
+            <!-- <a href="project.html">Projects</a> -->
+             <a href="Project.html">CODE</a>
+            <button id="theme-toggle" aria-label="Toggle Dark/Light Mode">🌙</button> <!-- Toggle button -->
+        </nav>
+    </header>
+    <main id="main">
+      <div class="container">
+        <article id="main-col">
+          <h1 class="page-title">Projects Code</h1>
+          <ul id="services">
+            <li>
+              <h2>4 Channel IR Swich With EEPROM</h2>
+              <h4>Requirement</h4>
+                <p class="comp">1. 1x Node MCU ESP8266</p>
+                <p class="comp">2. 4x 4V LED (Any Color)</p>
+                <p class="comp">3. 4x 220 Ohm Resistor</p>
+                <p class="comp">4. 1x IR Receive (sensor)</p>
+                <p class="comp">5. Jumber Wire</p>
+                <p class="comp">6. If Control 220V AC Appliances Use Relay      Module</p>
+              <object data="img/ESP8266-IR-LED-SWITCH.pdf" type="application/pdf" width="600" height="400"><p>It appears you don't have a PDF plugin for this browser. No biggie... you can <a href="img/ESP8266-IR-LED-SWITCH.pdf">click here to download the PDF file.</a></p></object>
+
+            </li>
+            <li>
+              <button onclick="copyText()" class="copy">&lt;/&gt; Get Code</button>
+              <h3>4 Channel IR Swich With EEPROM</h3>
+              <pre>
+                <code id="textcode" class="code-block">
+// Auto Nex
+// Programmed by Shivam.R.Kushvaha
+// Visit my YouTube Channel for more info - https://youtu.be/PbUfgnecyyE?si=Flm6uaV3oQLr8z0U 
+                  
+#include &lt;ESP8266WiFi.h&gt; 
+#include &lt;IRrecv.h&gt;
+#include &lt;IRutils.h&gt;
+#include &lt;EEPROM.h&gt;
+  
+#define IR_PIN D5 // Define the pin for IR receiver
+  
+// These variables store current output state of LED
+  int outputRedState;
+  int outputGreenState;
+  int outputYellowState;
+  int outputBlueState;
+  int outputAllState; 
+  
+  // Assign output variables to GPIO pins
+  const int redLED = 5;//D1
+  const int greenLED = 4;//D2
+  const int yellowLED = 12; //D6
+  const int blueLED = 13;//D7
+
+  IRrecv irrecv(IR_PIN);
+  decode_results results; 
+  
+void setup() {
+  //read eeprom
+  EEPROM.begin(512);
+  outputRedState = EEPROM.read(1);
+  outputGreenState = EEPROM.read(2);
+  outputYellowState = EEPROM.read(3);
+  outputBlueState = EEPROM.read(4);
+        
+  irrecv.enableIRIn(); // Start the IR receiver
+  
+  // Initialize the output variables as outputs
+    pinMode(redLED, OUTPUT);
+    pinMode(greenLED, OUTPUT);
+    pinMode(yellowLED,OUTPUT);
+    pinMode(blueLED,OUTPUT);
+  // Set outputs to LOW
+    digitalWrite(redLED, outputRedState);
+    digitalWrite(greenLED,outputGreenState);
+    digitalWrite(yellowLED, outputYellowState);
+    digitalWrite(blueLED, outputBlueState); 
+}
+  
+void loop(){
+  digitalWrite(redLED, outputRedState);
+  digitalWrite(greenLED,outputGreenState);
+  digitalWrite(yellowLED, outputYellowState);
+  digitalWrite(blueLED, outputBlueState);
+  
+  if (irrecv.decode(&results)) {
+        // If an IR signal is received
+  Serial.println((unsigned long)results.value, HEX); // Print the received IR value
+    switch(results.value) {
+      case 0x1FE48B7: // Example IR hex code for turning AllLEDs on
+      if (outputRedState != 0 || outputGreenState != 0 || outputYellowState != 0 || outputBlueState != 0) {
+      outputAllState = 0;
+      outputRedState = 0;
+      outputGreenState = 0;
+      
+      outputYellowState = 0;
+      
+      outputBlueState = 0;
+      data();
+      Serial.println("All led on using ir");
+      } else {
+      outputAllState = 1;
+      outputRedState = 1;
+      
+      outputGreenState = 1;
+      
+      outputYellowState = 1;
+      
+      outputBlueState = 1;
+      data();
+      Serial.println("All led off using ir led");
+      }
+      break;
+      case 0x1FE50AF: // Example IR hex code for turning redLED on
+      if (outputRedState != 0){
+      outputRedState = 0;
+      data();
+      } else {
+      outputRedState = 1;
+      data();
+      }
+      break;
+      case 0x1FED827: // Example IR hex code for turning greenLED on
+      if (outputGreenState != 0) {
+      outputGreenState = 0;
+      data();
+      } else {
+      outputGreenState = 1;
+      data();
+      }
+      break;
+      case 0x1FEF807: // Example IR hex code for turning yellowLED on
+      if (outputYellowState != 0) {
+      outputYellowState = 0;
+      data();
+      } else {
+      outputYellowState = 1;
+      data();
+      }
+      break;
+      case 0x1FE30CF: // Example IR hex code for turning blueLED on
+      if (outputBlueState != 0) {
+      outputBlueState = 0;
+      data;
+      } else {
+      outputBlueState = 1;
+      data();
+      }
+      break;
+      // Add more cases for different IR commands as needed
+    }
+    irrecv.resume(); // Receive the next value
+  }
+}
+  
+void data(){
+  EEPROM.write(1,outputRedState);
+  EEPROM.write(2,outputGreenState);
+  EEPROM.write(3,outputYellowState);
+  EEPROM.write(4,outputBlueState);
+  EEPROM.commit();
+}
+  
+  
+                </code>
+              </pre>
+            </li>
+          </ul>
+        </article>
+
+       
+      </div>
+        
+    </main>
+    <div class="container">
+        <!--<button class="copy" onclick="send()">EMAIL@</button>-->
+        <button id="email" onclick="send()">
+          <div class="svg-wrapper-1">
+            <div class="svg-wrapper">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+              >
+                <path fill="none" d="M0 0h24v24H0z"></path>
+                <path
+                  fill="currentColor"
+                  d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <span>Send Message</span>
+        </button>
+      </div>
+    <footer>
+        <p>&copy; 2025 Auto Nex. All rights reserved.</p>
+        <p class="dev">Shivam.R.Kushvaha</p>
+        <nav>
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms of Use</a>
+        </nav>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        function send(){
+        window.location.href='mailto:shivam69772@gmail.com?subject=Informe%20about%20Errors&body=Write%20here';
+      }
+      function copyText() {
+            // Get the text from the pre tag
+            const preText = document.getElementById('textcode').innerText;
+            // Create a temporary textarea element to hold the text
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = preText;
+            document.body.appendChild(tempTextArea);
+            // Select the text inside the textarea
+            tempTextArea.select();
+            // Copy the text to the clipboard
+            document.execCommand('copy');
+            // Remove the temporary textarea element
+            document.body.removeChild(tempTextArea);
+            alert('Code copied to clipboard');
+        }
+        function yt(){
+          window.open("https://youtu.be/mKL8WBUvvSk?si=YW_JyXzjaCYReMZC","_blank");
+        }
+    </script>
+</body>
+</html>

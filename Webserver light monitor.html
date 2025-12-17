@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Nex</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="email.css">
+    <link rel="icon"  href="img/logo.png">
+    <!-- <link rel="stylesheet" href="E:\A2Z-ROBO\A2Z-ROBO\css\style.css"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img class="image" src="img/logo.png" alt="Auto Nex Logo" > <!-- logo image -->
+            <h1><span class="highlight">Auto</span> Nex</h1>
+        </div>
+        <nav>
+            <a href="index.html">HOME</a>
+            <!-- <a href="#contact">Contact</a> -->
+            <!-- <a href="project.html">Projects</a> -->
+             <a href="Project.html">CODE</a>
+            <button id="theme-toggle" aria-label="Toggle Dark/Light Mode">🌙</button> <!-- Toggle button -->
+        </nav>
+    </header>
+    <main id="main">
+      <div class="container">
+        <article id="main-col">
+          <h1 class="page-title">Projects Code</h1>
+          <ul id="services">
+            <li>
+              <h2>Webserver Light (Monitor) Meter</h2>
+              <h4>Requirement</h4>
+                <p class="comp">1. 1x Node MCU ESP8266</p>
+                <p class="comp">2. 1x LDR</p>
+                <p class="comp">3. 1x 10k Resistor</p>
+                <p class="comp">4. 1x Breadboard</p>
+            </li>
+            <li>
+              <!-- <button class="copyText"><a href="arduino code/LIGHT_METER.ino"> &lt;/&gt; Get Code </a></button> -->
+               <button onclick="copyText()" class="copy">&lt;/&gt; Get Code</button>
+              <h3>Webserver Light Meter</h3>
+              <pre><code id="textcode">
+// Auto Nex
+// Programmed by Shivam.R.Kushvaha
+// Visit my YouTube Channel for more info - https://youtu.be/PbUfgnecyyE?si=Flm6uaV3oQLr8z0U 
+
+#include &lt;ESP8266WiFi.h&gt;
+#include &lt;ESPAsyncWebSrv.h&gt;
+#include &lt;WebSocketsServer.h&gt;
+#include &lt;Ticker.h&gt;
+    
+int analogPin = A0;
+    
+void send_sensor();
+Ticker timer;
+    
+char webpage[] PROGMEM = R"=====(
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Light Monitor&lt;/title&gt;
+        &lt;/head&gt;
+        &lt;style&gt;
+            body {
+                text-align: center;
+                font-size: 90px;
+            }
+            lable, #meter, h {
+                font-size: 80px;
+            }
+
+                rotate: 270deg;
+                margin-top: 200px;
+            }
+            #percentage {
+                margin-top: 0px;
+            }
+            meter::-webkit-meter-bar{
+                
+            }
+            meter::-webkit-meter-optimum-value{
+                background: linear-gradient(0.25turn, red ,yellow);
+            }
+        &lt;/style&gt;
+        &lt;body&gt;
+            &lt;lable&gt;LIGHT&lt;/lable&gt;
+            &lt;br/&gt;
+            &lt;h id="percentage"&gt;%&lt;/h&gt;
+            &lt;br/&gt;
+            &lt;meter id="meter" min="0" max="1024" value="0"&gt; &lt;/meter&gt;
+        &lt;/body&gt;
+        &lt;script&gt;
+            var connection = new WebSocket('ws://'+location.hostname+':81/');
+            connection.onmessage = function(event){
+               var FullDATA = event.data;
+               console.log(FullDATA);
+               var data = JSON.parse(FullDATA);
+               light = data.light;
+               document.getElementById("meter").value = light;
+               document.getElementById("percentage").innerText = light;
+                console.log(light);
+            }
+        &lt;/script&gt;
+    &lt;/html&gt;
+    )=====";
+    
+    AsyncWebServer server(80);
+    WebSocketsServer webSocket(81);
+    void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+    
+        switch(type) {
+            case WStype_DISCONNECTED:
+                Serial.printf("[%u] Disconnected!\n", num);
+                break;
+            case WStype_CONNECTED:
+                {
+                    IPAddress ip = webSocket.remoteIP(num);
+                    Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+            
+            // send message to client
+            webSocket.sendTXT(num, "Connected");
+                }
+                break;
+            case WStype_TEXT:
+               Serial.printf("[%u] get Text: %s\n", num, payload);
+               String message = String((char*)(payload));
+               Serial.println(message); 
+               }
+    }
+    
+    void notFound(AsyncWebServerRequest *request) {
+        request-&gt;send(404, "text/plain", "Not found");
+    }
+    void setup() {
+      Serial.begin(115200);
+     WiFi.softAP("LIGHT SENSOR","");
+      Serial.println("softap");
+      Serial.println("...");
+      Serial.println(WiFi.softAPIP());
+       server.on("/", [](AsyncWebServerRequest *request)
+
+        
+            request-&gt;send_P(200, "text/html", webpage );
+        });
+         server.onNotFound(notFound);
+          server.begin();
+          webSocket.begin();
+      webSocket.onEvent(webSocketEvent);
+      timer.attach(1,send_sensor);
+    }
+    
+    void loop() {
+     webSocket.loop();
+    }
+    void send_sensor(){
+      int light = analogRead(analogPin);
+      String JSON_Data = "{\"light\":";
+             JSON_Data += light;
+             JSON_Data +="}";
+             Serial.println(JSON_Data);
+             webSocket.broadcastTXT(JSON_Data);
+    }
+    
+
+              </code></pre>
+            </li>
+          </ul>
+        </article>
+
+       
+      </div>
+
+        
+    </main>
+    <div class="container">
+        <!--<button class="copy" onclick="send()">EMAIL@</button>-->
+        <button id="email" onclick="send()">
+          <div class="svg-wrapper-1">
+            <div class="svg-wrapper">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+              >
+                <path fill="none" d="M0 0h24v24H0z"></path>
+                <path
+                  fill="currentColor"
+                  d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <span>Send Message</span>
+        </button>
+      </div>
+    <footer>
+        <p>&copy; 2025 Auto Nex. All rights reserved.</p>
+        <p class="dev">Shivam.R.Kushvaha</p>
+        <nav>
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms of Use</a>
+        </nav>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        function send(){
+        window.location.href='mailto:shivam69772@gmail.com?subject=Informe%20about%20Errors&body=Write%20here';
+      }
+      function copyText() {
+            // Get the text from the pre tag
+            const preText = document.getElementById('textcode').innerText;
+            // Create a temporary textarea element to hold the text
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = preText;
+            document.body.appendChild(tempTextArea);
+            // Select the text inside the textarea
+            tempTextArea.select();
+            // Copy the text to the clipboard
+            document.execCommand('copy');
+            // Remove the temporary textarea element
+            document.body.removeChild(tempTextArea);
+            alert('Code copied to clipboard');
+        }
+        function yt(){
+          window.open("https://youtu.be/mKL8WBUvvSk?si=YW_JyXzjaCYReMZC","_blank");
+        }
+    </script>
+</body>
+</html>
