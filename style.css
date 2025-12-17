@@ -110,7 +110,7 @@ main {
     color: #0056b3;
 }
 footer {
-    background-color: #333;
+    background-color:#3c3c3c;    /*#333 */
     color: white;
     text-align: center;
     padding: 1rem;
@@ -126,6 +126,9 @@ footer p{
     color: white;
 }
 
+footer a {
+    text-decoration: none;
+}
 /* Dark Mode Styles */
 body.dark-mode {
     /* background-color: #121212; */
@@ -151,7 +154,7 @@ body.dark-mode .category a:hover {
     color: #64b5f6;
 }
 body.dark-mode footer {
-    background-color: #1e1e1e;
+     background-color:#3c3c3c;    /* #1e1e1e */
 }
 body.dark-mode .image {
     border: 2px double rgb(73, 67, 231)
@@ -339,4 +342,13 @@ pre {
   width:80%;
   margin:auto;
   overflow:hidden;
+
+}
+
+a {
+    text-decoration: none;
+}
+
+footer #nav {
+    font-size: 0.8rem;
 }
